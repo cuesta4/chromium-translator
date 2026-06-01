@@ -4,7 +4,7 @@ In-place web page translation — no redirect, no reload. Built for Chromium-bas
 
 ## Why this exists
 
-Chromium-based browsers (Brave, Opera, Vivaldi, Edge, Ungoogled Chromium, Thorium, etc.) struggle with the lack of a proper translation extension. The available options rely on Google Translate's official widget, which:
+Chromium-based browsers (Helium, Brave, Opera, Vivaldi, Edge, Ungoogled Chromium, Thorium, etc.) struggle with the lack of a proper translation extension. The available options rely on Google Translate's official widget, which:
 
 - **Redirects the page** to `translate.google.com`, reloading everything
 - **Gets blocked** by sites like [RuTracker.org](https://rutracker.org) and other forums that reject external script injection
