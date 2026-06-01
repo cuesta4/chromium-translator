@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="logo">&#128065;</span>
+      <h1>Chromium Translator</h1>
+    </div>
+
+    <div class="section">
+      <div class="toggle-row">
+        <span class="label">Tradução</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleEnabled" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="section">
+      <label class="label">Idioma alvo</label>
+      <select id="targetLang">
+        <option value="">Selecionar idioma...</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <div class="toggle-row">
+        <span class="label">Traduzir apenas idioma predominante</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleFilterLang" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <span class="sub-hint">Detecta o idioma principal da página e ignora textos em outros idiomas</span>
+    </div>
+
+    <div class="section">
+      <label class="label">Serviço de tradução</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="service" value="google" checked>
+          <span>Google Translate (sem chave)</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="service" value="deepseek">
+          <span>DeepSeek AI</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="section api-key-section hidden" id="apiKeySection">
+      <label class="label" for="modelSelect">Modelo</label>
+      <div class="model-row">
+        <select id="modelSelect" disabled>
+          <option value="">Preencha a chave API...</option>
+        </select>
+        <button id="refreshModels" class="icon-btn hidden" title="Atualizar modelos">&#x21bb;</button>
+      </div>
+      <span id="modelStatus" class="status-msg hidden"></span>
+
+      <label class="label" for="apiKey" style="margin-top:8px">Chave API DeepSeek</label>
+      <input type="password" id="apiKey" placeholder="sk-...">
+      <a href="https://platform.deepseek.com/api_keys" target="_blank" class="api-link">
+        Obter chave gratuita
+      </a>
+    </div>
+
+    <div class="footer">
+      <p class="hint">Clique com botão direito na página e selecione <strong>"Traduzir esta página"</strong></p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

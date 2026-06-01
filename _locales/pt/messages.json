@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Chromium Translator"
+  },
+  "extDesc": {
+    "message": "Tradução in-page via Google Translate ou DeepSeek AI. Clique com botão direito e selecione 'Traduzir esta página'."
+  },
+  "contextMenuTitle": {
+    "message": "Traduzir esta página"
+  }
+}
