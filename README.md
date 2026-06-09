@@ -1,8 +1,8 @@
 # Chromium Translator
 
-In-place web page translation — no redirect, no reload. Built for Chromium-based browsers that lack a decent translation extension.
+## Version
 
-## Why this exists
+`1.1.1`
 
 Chromium-based browsers (Helium, Brave, Opera, Vivaldi, Edge, Ungoogled Chromium, Thorium, etc.) struggle with the lack of a proper translation extension. The available options rely on Google Translate's official widget, which:
 
@@ -20,49 +20,45 @@ Chromium-based browsers (Helium, Brave, Opera, Vivaldi, Edge, Ungoogled Chromium
 
 | Feature | Description |
 |---|---|
-| **Built-in Google Translate** | Uses the `translate.googleapis.com` endpoint — **no API key required** |
-| **DeepSeek AI (optional)** | For those who prefer AI translation, with a free key from [platform.deepseek.com](https://platform.deepseek.com/api_keys) |
-| **Dominant language detection** | Identifies the page's primary language and skips text in other languages (e.g., English movie titles on a Russian page) |
-| **Progressive translation** | Translates top-to-bottom in batches — the top of the page is ready first |
-| **Smart caching** | Translated texts are cached, speeding up repeat visits |
-| **Restore original** | Reverts to original text when the extension is disabled |
-| **32 languages** | Arabic, Bulgarian, Chinese (Simplified & Traditional), Czech, Danish, Dutch, English, Filipino, Finnish, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Malay, Norwegian, Polish, Portuguese, Romanian, Russian, Spanish, Swedish, Thai, Turkish, Ukrainian, Vietnamese, and more |
+| **Built-in Google translation** | Uses the Google translation endpoint without requiring an API key |
+| **DeepSeek AI (optional)** | Uses a configured DeepSeek API key and model |
+| **Viewport-aware scheduling** | Translates what is visible first, prefetches nearby content, and processes distant content only when capacity is available |
+| **Dynamic-page support** | Continues observing SPAs and newly inserted content after the first translation pass |
+| **Dominant-language filter** | Optionally identifies the main page language and skips unrelated text fragments |
+| **Bounded smart cache** | Reuses translations while pruning old entries to avoid unbounded `chrome.storage.local` growth |
+| **Safe restoration** | Restores original text without overwriting legitimate page mutations made afterward |
+| **On-demand injection** | Loads the content script only when translation is requested; the language detector is loaded only when needed |
 
 ## Installation
 
-### Step 1: Download
-```bash
-git clone https://github.com/{your-username}/chromium-translator.git
-```
-Or download the ZIP and extract it to a folder.
-
-### Step 2: Load the extension
-1. Open `chrome://extensions/` in your browser
-2. Enable **Developer mode** (toggle in the top-right corner)
-3. Click **Load unpacked**
-4. Select the project folder
-
-### Step 3: Configure (first use)
-1. Click the extension icon in the toolbar
-2. Select your **target language** (e.g., Portuguese)
-3. (Optional) Select DeepSeek AI and paste your free API key
+1. Extract the ZIP to a permanent folder.
+2. Open `chrome://extensions/`.
+3. Enable **Developer mode**.
+4. Click **Load unpacked**.
+5. Select the extracted `chromium-translator` folder.
 
 ## Usage
 
-1. **Right-click** anywhere on a page
-2. Select **"Translate this page"**
-3. Text will be translated progressively from top to bottom
-4. To disable, open the popup and toggle off — all texts revert to the original
+1. Open the popup and configure the target language.
+2. Right-click a page and choose **Translate this page**.
+3. Visible content is translated first. As the user scrolls, the active region is reprioritized automatically.
+4. Disable translation in the popup to restore original text where restoration remains safe.
 
-### Popup options
+## Popup options
 
 | Option | Description |
 |---|---|
-| **Translation** | Enable/disable the extension |
-| **Target language** | Which language to translate into |
-| **Translate dominant language only** | Detects the page's primary language and skips text in other languages (e.g., English movie titles on a Russian forum) |
-| **Service** | Google Translate (no key needed) or DeepSeek AI (requires free API key) |
-| **Model** | DeepSeek model (fetched automatically from the API) |
+| **Translation** | Enables or disables translation and restores text when disabled |
+| **Target language** | Destination language |
+| **Translate dominant language only** | Skips fragments that do not match the dominant source language |
+| **Service** | Google translation or DeepSeek AI |
+| **Model** | DeepSeek model, loaded from the API only when DeepSeek is selected |
+
+## Technical notes
+
+- Google and DeepSeek requests are coordinated by service-worker brokers with request spacing, cooldown sharing, retries, jitter, and bounded timeouts.
+- The Google endpoint used by this extension is not a contracted public API. Its availability and throttling behavior can change independently of the extension.
+- Text inside hidden ancestors, code blocks, form controls, editable regions, and `translate="no"` containers is skipped.
 
 ## License
 

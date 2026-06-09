@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "__MSG_extDesc__",
   "default_locale": "pt",
   "author": "Chromium Translator",
@@ -17,15 +17,12 @@
   "background": {
     "service_worker": "background/service-worker.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["lib/franc-min-bundle.js", "content/content.js"],
-      "run_at": "document_idle",
-      "all_frames": false
-    }
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "contextMenus"
   ],
-  "permissions": ["activeTab", "storage", "contextMenus"],
   "host_permissions": [
     "https://translate.googleapis.com/*",
     "https://api.deepseek.com/*"

@@ -34,6 +34,8 @@ const LANGUAGES = [
 ];
 
 const DEEPSEEK_MODELS_URL = 'https://api.deepseek.com/v1/models';
+const MODELS_TIMEOUT_MS = 10000;
+let currentModel = 'deepseek-chat';
 
 const elements = {
   toggleEnabled: document.getElementById('toggleEnabled'),
@@ -82,11 +84,14 @@ async function loadSettings() {
     }
 
     elements.apiKey.value = settings.apiKey || '';
+    currentModel = settings.model || 'deepseek-chat';
 
     updateApiKeyVisibility();
 
-    if (settings.apiKey) {
-      await fetchModels(settings.apiKey, settings.model);
+    if (settings.service === 'deepseek' && settings.apiKey) {
+      await fetchModels(settings.apiKey, currentModel);
+    } else if (settings.apiKey) {
+      setModelSelectFallback(currentModel);
     } else {
       setModelSelectEmpty();
     }
@@ -137,9 +142,12 @@ async function fetchModels(apiKey, savedModel, forceRefresh) {
   setModelSelectLoading();
   elements.refreshModels.classList.remove('hidden');
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), MODELS_TIMEOUT_MS);
   try {
     const response = await fetch(DEEPSEEK_MODELS_URL, {
-      headers: { 'Authorization': `Bearer ${apiKey}` }
+      headers: { 'Authorization': `Bearer ${apiKey}` },
+      signal: controller.signal
     });
 
     if (!response.ok) {
@@ -167,6 +175,8 @@ async function fetchModels(apiKey, savedModel, forceRefresh) {
     elements.modelStatus.textContent = 'Erro ao buscar modelos: ' + err.message;
     elements.modelStatus.classList.remove('hidden');
     elements.refreshModels.classList.remove('hidden');
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -193,6 +203,7 @@ function populateModelSelect(models, savedModel) {
   if (!foundSaved && models.length > 0) {
     elements.modelSelect.value = models[0];
   }
+  currentModel = elements.modelSelect.value || currentModel;
 }
 
 function setModelSelectFallback(savedModel) {
@@ -215,20 +226,22 @@ function setModelSelectFallback(savedModel) {
   if (!found && fallbackModels.length > 0) {
     elements.modelSelect.value = fallbackModels[0];
   }
+  currentModel = elements.modelSelect.value || currentModel;
 }
 
 function getSelectedModel() {
-  return elements.modelSelect.value || 'deepseek-chat';
+  return elements.modelSelect.value || currentModel || 'deepseek-chat';
 }
 
 async function saveSettings() {
   const apiKey = elements.apiKey.value.trim();
+  currentModel = getSelectedModel();
   const settings = {
     enabled: elements.toggleEnabled.checked,
     targetLang: elements.targetLang.value,
     service: elements.serviceDeepSeek.checked ? 'deepseek' : 'google',
     apiKey: apiKey,
-    model: getSelectedModel(),
+    model: currentModel,
     filterByLang: elements.toggleFilterLang.checked
   };
 
@@ -249,15 +262,20 @@ function setupListeners() {
     updateApiKeyVisibility();
     saveSettings();
   });
-  elements.serviceDeepSeek.addEventListener('change', () => {
+  elements.serviceDeepSeek.addEventListener('change', async () => {
     updateApiKeyVisibility();
+    const apiKey = elements.apiKey.value.trim();
+    if (elements.serviceDeepSeek.checked && apiKey) await fetchModels(apiKey, currentModel);
     saveSettings();
   });
-  elements.modelSelect.addEventListener('change', saveSettings);
+  elements.modelSelect.addEventListener('change', () => {
+    currentModel = getSelectedModel();
+    saveSettings();
+  });
 
   elements.apiKey.addEventListener('input', debounce(async () => {
     const apiKey = elements.apiKey.value.trim();
-    if (apiKey.length >= 30) {
+    if (apiKey.length >= 30 && elements.serviceDeepSeek.checked) {
       await fetchModels(apiKey, getSelectedModel());
     } else if (apiKey.length === 0) {
       setModelSelectEmpty();
